@@ -1,7 +1,7 @@
 name: Fetch WTI page
 on:
   schedule:
-    - cron: "14 */2 * * *"
+    - cron: "0 23 * * *"  # 7am Hong Kong time (UTC+8)
   push:
     branches: [ master ]
   pull_request:
@@ -74,9 +74,26 @@ jobs:
       timeout-minutes: 5
       run: |
         python sbase_fetcher.py -o wti.html "https://www.investing.com/commodities/crude-oil-contracts"
+    - name: Fetch Brent page
+      timeout-minutes: 5
+      run: |
+        python sbase_fetcher.py -o brent.html "https://www.investing.com/commodities/brent-oil-contracts"
+    - name: Fetch VIX page
+      timeout-minutes: 5
+      run: |
+        python sbase_fetcher.py -o vix.html "https://www.investing.com/indices/us-spx-vix-futures-contracts"
     - name: Upload wti.html
       uses: actions/upload-artifact@v6
       with:
         name: wti-html
         path: wti.html
-
+    - name: Upload brent.html
+      uses: actions/upload-artifact@v6
+      with:
+        name: brent-html
+        path: brent.html
+    - name: Upload vix.html
+      uses: actions/upload-artifact@v6
+      with:
+        name: vix-html
+        path: vix.html
