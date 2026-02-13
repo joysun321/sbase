@@ -25,7 +25,8 @@ def fetch_page(url, output_filename=None):
 
     try:
         # Create SeleniumBase context with undetected Chrome mode
-        with SB(uc=True, test=True, headed=True) as sb:
+        # with SB(uc=True, test=True, headed=True) as sb:
+        with SB(uc=True) as sb:
             logging.info("Activating CDP mode...")
             # Activate Chrome DevTools Protocol mode for better control
             sb.activate_cdp_mode(url)
@@ -72,7 +73,7 @@ def main():
     """Main entry point"""
     # Configure logging
     logging.basicConfig(
-        stream=sys.stdout,
+        filename="/tmp/sbase_fetcher.log",
         level=logging.INFO,
         format="%(asctime)s - %(levelname)s - %(message)s",
         force=True,  # Ensure configuration is applied if previously configured
