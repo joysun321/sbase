@@ -28,6 +28,7 @@ jobs:
       run: |
         seleniumbase install chromedriver
     - name: Fetch WTI page
+      timeout-minutes: 5
       run: |
         python sbase_fetcher.py -o wti.html "https://www.investing.com/commodities/crude-oil-contracts"
     - name: Upload wti.html

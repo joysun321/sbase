@@ -72,7 +72,7 @@ def main():
     """Main entry point"""
     # Configure logging
     logging.basicConfig(
-        filename="/tmp/sbase_fetcher.log",
+        stream=sys.stdout,
         level=logging.INFO,
         format="%(asctime)s - %(levelname)s - %(message)s",
         force=True,  # Ensure configuration is applied if previously configured
