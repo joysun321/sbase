@@ -82,6 +82,10 @@ jobs:
       timeout-minutes: 5
       run: |
         python sbase_fetcher.py -o vix.html "https://www.investing.com/indices/us-spx-vix-futures-contracts"
+    - name: Fetch Trading Economics Commodities page
+      timeout-minutes: 5
+      run: |
+        python sbase_fetcher.py -o tradingecon_commodities.html "https://tradingeconomics.com/commodities"
     - name: Upload wti.html
       uses: actions/upload-artifact@v6
       with:
@@ -97,3 +101,8 @@ jobs:
       with:
         name: vix-html
         path: vix.html
+    - name: Upload tradingecon_commodities.html
+      uses: actions/upload-artifact@v6
+      with:
+        name: tradingecon-commodities-html
+        path: tradingecon_commodities.html
