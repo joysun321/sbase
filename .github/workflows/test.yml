@@ -86,23 +86,8 @@ jobs:
       timeout-minutes: 5
       run: |
         python sbase_fetcher.py -o tradingecon_commodities.html "https://tradingeconomics.com/commodities"
-    - name: Upload wti.html
+    - name: Upload output files
       uses: actions/upload-artifact@v6
       with:
-        name: wti-html
-        path: wti.html
-    - name: Upload brent.html
-      uses: actions/upload-artifact@v6
-      with:
-        name: brent-html
-        path: brent.html
-    - name: Upload vix.html
-      uses: actions/upload-artifact@v6
-      with:
-        name: vix-html
-        path: vix.html
-    - name: Upload tradingecon_commodities.html
-      uses: actions/upload-artifact@v6
-      with:
-        name: tradingecon-commodities-html
-        path: tradingecon_commodities.html
+        name: output
+        path: ./*.html
