@@ -82,6 +82,10 @@ jobs:
       timeout-minutes: 5
       run: |
         python sbase_fetcher.py -o vix.html "https://www.investing.com/indices/us-spx-vix-futures-contracts"
+    - name: Fetch Fed Rate Monitor page
+      timeout-minutes: 5
+      run: |
+        python sbase_fetcher.py -o fed_rate_monitor.html "https://www.investing.com/central-banks/fed-rate-monitor"
     - name: Fetch Trading Economics Commodities page
       timeout-minutes: 5
       run: |
