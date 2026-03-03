@@ -90,6 +90,22 @@ jobs:
       timeout-minutes: 5
       run: |
         python sbase_fetcher.py -o tradingecon_commodities.html "https://tradingeconomics.com/commodities"
+    - name: Fetch U.S. 2-Year Bond Yield Historical Data page
+      timeout-minutes: 5
+      run: |
+        python sbase_fetcher.py -o us_2yr_bond_yield.html "https://www.investing.com/rates-bonds/u.s.-2-year-bond-yield-historical-data"
+    - name: Fetch U.S. 5-Year Bond Yield Historical Data page
+      timeout-minutes: 5
+      run: |
+        python sbase_fetcher.py -o us_5yr_bond_yield.html "https://www.investing.com/rates-bonds/u.s.-5-year-bond-yield-historical-data"
+    - name: Fetch U.S. 10-Year Bond Yield Historical Data page
+      timeout-minutes: 5
+      run: |
+        python sbase_fetcher.py -o us_10yr_bond_yield.html "https://www.investing.com/rates-bonds/u.s.-10-year-bond-yield-historical-data"
+    - name: Fetch U.S. 30-Year Bond Yield Historical Data page
+      timeout-minutes: 5
+      run: |
+        python sbase_fetcher.py -o us_30yr_bond_yield.html "https://www.investing.com/rates-bonds/u.s.-30-year-bond-yield-historical-data"
     - name: Upload output files
       uses: actions/upload-artifact@v6
       with:
