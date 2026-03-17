@@ -106,6 +106,10 @@ jobs:
       timeout-minutes: 5
       run: |
         python sbase_fetcher.py -o us_30yr_bond_yield.html "https://www.investing.com/rates-bonds/u.s.-30-year-bond-yield-historical-data"
+    - name: Fetch Eric Jhonsa portfolio page
+      timeout-minutes: 5
+      run: |
+        python sbase_fetcher.py -o eric_jhonsa_portfolio.html "https://app.alphaport.ai/shares/0d779b39-fa73-44e4-9039-d9d6c320d3aa"
     - name: Upload output files
       uses: actions/upload-artifact@v6
       with:
