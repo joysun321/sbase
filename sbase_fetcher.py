@@ -10,6 +10,18 @@ import logging
 from seleniumbase import SB  # type: ignore
 
 
+def normalize_surrogates(content):
+    """Convert UTF-16 surrogate pairs and replace malformed lone surrogates."""
+    try:
+        content.encode("utf-8")
+        return content
+    except UnicodeEncodeError:
+        logging.warning("Page content contains UTF-16 surrogates; normalizing them")
+        return content.encode("utf-16", errors="surrogatepass").decode(
+            "utf-16", errors="replace"
+        )
+
+
 def fetch_page(url, output_filename=None):
     """
     Fetch HTML content from URL using SeleniumBase with undetected Chrome mode
@@ -48,7 +60,7 @@ def fetch_page(url, output_filename=None):
 
             # Extract page source
             logging.info("Extracting page content...")
-            html_content = sb.get_page_source()
+            html_content = normalize_surrogates(sb.get_page_source())
 
             if output_filename:
                 # Save HTML content to file
