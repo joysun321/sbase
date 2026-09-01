@@ -62,6 +62,13 @@ def fetch_page(url, output_filename=None):
             logging.info("Extracting page content...")
             html_content = normalize_surrogates(sb.get_page_source())
 
+            # Refresh the page if html_content too short or empty
+            if not html_content or len(html_content) < 500:
+                logging.info("Page content seems incomplete, refreshing the page...")
+                sb.refresh()
+                sb.sleep(2)
+                html_content = normalize_surrogates(sb.get_page_source())
+
             if output_filename:
                 # Save HTML content to file
                 logging.info(f"Saving content to {output_filename}...")
