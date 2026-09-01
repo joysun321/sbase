@@ -106,10 +106,13 @@ jobs:
       timeout-minutes: 5
       run: |
         python sbase_fetcher.py -o us_30yr_bond_yield.html "https://www.investing.com/rates-bonds/u.s.-30-year-bond-yield-historical-data"
+    - name: Move log file to current working directory
+      run: |
+        mv /tmp/sbase_fetcher.log .
     - name: Upload output files
       uses: actions/upload-artifact@v6
       with:
         name: output
         path: |
           ./*.html
-          /tmp/sbase_fetcher.log
+          ./sbase_fetcher.log
