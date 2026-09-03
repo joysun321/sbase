@@ -71,48 +71,62 @@ jobs:
         python -c "from seleniumbase.core import detect_b_ver; print(detect_b_ver.get_binary_location('google-chrome'))"
         python -c "from seleniumbase import undetected; print(undetected.find_chrome_executable())"
     - name: Fetch WTI page
+      continue-on-error: true
       timeout-minutes: 5
       run: |
         python sbase_fetcher.py -o wti.html "https://www.investing.com/commodities/crude-oil-contracts"
     - name: Fetch Brent page
+      continue-on-error: true 
       timeout-minutes: 5
       run: |
         python sbase_fetcher.py -o brent.html "https://www.investing.com/commodities/brent-oil-contracts"
     - name: Fetch VIX page
+      continue-on-error: true
       timeout-minutes: 5
       run: |
         python sbase_fetcher.py -o vix.html "https://www.investing.com/indices/us-spx-vix-futures-contracts"
     - name: Fetch Fed Rate Monitor page
+      continue-on-error: true
       timeout-minutes: 5
       run: |
         python sbase_fetcher.py -o fed_rate_monitor.html "https://www.investing.com/central-banks/fed-rate-monitor"
     - name: Fetch Trading Economics Commodities page
+      continue-on-error: true
       timeout-minutes: 5
       run: |
         python sbase_fetcher.py -o tradingecon_commodities.html "https://tradingeconomics.com/commodities"
     - name: Fetch U.S. 2-Year Bond Yield Historical Data page
+      continue-on-error: true
       timeout-minutes: 5
       run: |
         python sbase_fetcher.py -o us_2yr_bond_yield.html "https://www.investing.com/rates-bonds/u.s.-2-year-bond-yield-historical-data"
     - name: Fetch U.S. 5-Year Bond Yield Historical Data page
+      continue-on-error: true
       timeout-minutes: 5
       run: |
         python sbase_fetcher.py -o us_5yr_bond_yield.html "https://www.investing.com/rates-bonds/u.s.-5-year-bond-yield-historical-data"
     - name: Fetch U.S. 10-Year Bond Yield Historical Data page
+      continue-on-error: true
       timeout-minutes: 5
       run: |
         python sbase_fetcher.py -o us_10yr_bond_yield.html "https://www.investing.com/rates-bonds/u.s.-10-year-bond-yield-historical-data"
     - name: Fetch U.S. 30-Year Bond Yield Historical Data page
+      continue-on-error: true
       timeout-minutes: 5
       run: |
         python sbase_fetcher.py -o us_30yr_bond_yield.html "https://www.investing.com/rates-bonds/u.s.-30-year-bond-yield-historical-data"
     - name: Move log file to current working directory
+      if: always()
       run: |
-        mv /tmp/sbase_fetcher.log .
+        if [ -f /tmp/sbase_fetcher.log ]; then
+          mv /tmp/sbase_fetcher.log .
+        fi
     - name: Upload output files
+      if: always()
       uses: actions/upload-artifact@v6
       with:
         name: output
         path: |
           ./*.html
           ./sbase_fetcher.log
+        if-no-files-found: warn
