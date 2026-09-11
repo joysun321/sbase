@@ -7,7 +7,44 @@ Fetches content from websites with bot detection and CAPTCHA handling
 import sys
 import argparse
 import logging
+import signal
+from contextlib import contextmanager
 from seleniumbase import SB  # type: ignore
+
+
+class CaptchaTimeoutError(TimeoutError):
+    pass
+
+
+@contextmanager
+def captcha_timeout(seconds):
+    def handle_timeout(signum, frame):
+        raise CaptchaTimeoutError(
+            f"CAPTCHA handling exceeded {seconds:g} seconds"
+        )
+
+    previous_handler = signal.signal(signal.SIGALRM, handle_timeout)
+    previous_timer = signal.setitimer(signal.ITIMER_REAL, seconds)
+    try:
+        yield
+    finally:
+        signal.setitimer(signal.ITIMER_REAL, *previous_timer)
+        signal.signal(signal.SIGALRM, previous_handler)
+
+
+def handle_captcha(sb, timeout_seconds, attempts):
+    for attempt in range(1, attempts + 1):
+        try:
+            with captcha_timeout(timeout_seconds):
+                sb.uc_gui_click_captcha()
+            logging.info("CAPTCHA check completed")
+            return
+        except CaptchaTimeoutError as error:
+            logging.warning(
+                "%s (attempt %d/%d)", error, attempt, attempts
+            )
+
+    logging.warning("CAPTCHA handling timed out; continuing without solving it")
 
 
 def normalize_surrogates(content):
@@ -22,7 +59,9 @@ def normalize_surrogates(content):
         )
 
 
-def fetch_page(url, output_filename=None):
+def fetch_page(
+    url, output_filename=None, captcha_timeout_seconds=15, captcha_attempts=2
+):
     """
     Fetch HTML content from URL using SeleniumBase with undetected Chrome mode
 
@@ -50,9 +89,7 @@ def fetch_page(url, output_filename=None):
             # Check and handle CAPTCHA if present
             logging.info("Checking for CAPTCHA...")
             try:
-                # However, this is unreliable
-                sb.uc_gui_click_captcha()
-                logging.info("CAPTCHA detected and handled")
+                handle_captcha(sb, captcha_timeout_seconds, captcha_attempts)
                 # Wait for CAPTCHA processing
                 sb.sleep(2)
             except Exception:
@@ -105,8 +142,27 @@ def main():
         "--output",
         help="Output filename to save HTML content instead of printing to stdout",
     )
+    parser.add_argument(
+        "--captcha-timeout",
+        type=float,
+        default=15,
+        metavar="SECONDS",
+        help="Maximum seconds per CAPTCHA attempt (default: 15)",
+    )
+    parser.add_argument(
+        "--captcha-attempts",
+        type=int,
+        default=2,
+        metavar="COUNT",
+        help="Total number of CAPTCHA attempts (default: 2)",
+    )
 
     args = parser.parse_args()
+
+    if args.captcha_timeout <= 0:
+        parser.error("--captcha-timeout must be greater than zero")
+    if args.captcha_attempts < 1:
+        parser.error("--captcha-attempts must be at least one")
 
     # Validate URL format
     if not args.url.startswith(("http://", "https://")):
@@ -114,7 +170,12 @@ def main():
         sys.exit(1)
 
     # Fetch the page
-    success = fetch_page(args.url, args.output)
+    success = fetch_page(
+        args.url,
+        args.output,
+        captcha_timeout_seconds=args.captcha_timeout,
+        captcha_attempts=args.captcha_attempts,
+    )
 
     if not success:
         sys.exit(1)
