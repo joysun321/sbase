@@ -97,7 +97,10 @@ def fetch_page(
 
             # Extract page source
             logging.info("Extracting page content...")
-            html_content = normalize_surrogates(sb.get_page_source())
+            page_source = sb.get_page_source()
+            logging.info(f"Initial page source length: {len(page_source)}")
+            html_content = normalize_surrogates(page_source)
+            logging.info(f"Normalized page source length: {len(html_content)}")
 
             # Refresh the page if html_content too short or empty
             if not html_content or len(html_content) < 500:
