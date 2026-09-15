@@ -19,9 +19,7 @@ class CaptchaTimeoutError(TimeoutError):
 @contextmanager
 def captcha_timeout(seconds):
     def handle_timeout(signum, frame):
-        raise CaptchaTimeoutError(
-            f"CAPTCHA handling exceeded {seconds:g} seconds"
-        )
+        raise CaptchaTimeoutError(f"CAPTCHA handling exceeded {seconds:g} seconds")
 
     previous_handler = signal.signal(signal.SIGALRM, handle_timeout)
     previous_timer = signal.setitimer(signal.ITIMER_REAL, seconds)
@@ -40,9 +38,7 @@ def handle_captcha(sb, timeout_seconds, attempts):
             logging.info("CAPTCHA check completed")
             return
         except CaptchaTimeoutError as error:
-            logging.warning(
-                "%s (attempt %d/%d)", error, attempt, attempts
-            )
+            logging.warning("%s (attempt %d/%d)", error, attempt, attempts)
 
     logging.warning("CAPTCHA handling timed out; continuing without solving it")
 
@@ -97,6 +93,16 @@ def fetch_page(
 
             # Extract page source
             logging.info("Extracting page content...")
+
+            # via javascript execution
+            page_source = driver.execute_script(
+                "return document.documentElement.outerHTML;"
+            )
+            logging.info(f"(JS) Initial page source length: {len(page_source)}")
+            html_content = normalize_surrogates(page_source)
+            logging.info(f"(JS) Normalized page source length: {len(html_content)}")
+
+            # via SeleniumBase's get_page_source() method
             page_source = sb.get_page_source()
             logging.info(f"Initial page source length: {len(page_source)}")
             html_content = normalize_surrogates(page_source)
