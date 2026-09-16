@@ -6,40 +6,7 @@ Fetches content from websites with bot detection and CAPTCHA handling
 import sys
 import argparse
 import logging
-import signal
-from contextlib import contextmanager
 from seleniumbase import SB  # type: ignore
-
-
-class CaptchaTimeoutError(TimeoutError):
-    pass
-
-
-@contextmanager
-def captcha_timeout(seconds):
-    def handle_timeout(signum, frame):
-        raise CaptchaTimeoutError(f"CAPTCHA handling exceeded {seconds:g} seconds")
-
-    previous_handler = signal.signal(signal.SIGALRM, handle_timeout)
-    previous_timer = signal.setitimer(signal.ITIMER_REAL, seconds)
-    try:
-        yield
-    finally:
-        signal.setitimer(signal.ITIMER_REAL, *previous_timer)
-        signal.signal(signal.SIGALRM, previous_handler)
-
-
-def handle_captcha(sb, timeout_seconds, attempts):
-    for attempt in range(1, attempts + 1):
-        try:
-            with captcha_timeout(timeout_seconds):
-                sb.uc_gui_click_captcha()
-            logging.info("CAPTCHA check completed")
-            return
-        except CaptchaTimeoutError as error:
-            logging.warning("%s (attempt %d/%d)", error, attempt, attempts)
-
-    logging.warning("CAPTCHA handling timed out; continuing without solving it")
 
 
 def normalize_surrogates(content):
@@ -79,12 +46,12 @@ def fetch_page(
 
             # Initial wait for page load
             logging.info("Waiting for initial page load...")
-            sb.sleep(2)
+            sb.sleep(4)
 
             # Check and handle CAPTCHA if present
             logging.info("Checking for CAPTCHA...")
             try:
-                handle_captcha(sb, captcha_timeout_seconds, captcha_attempts)
+                sb.uc_gui_click_captcha()
                 # Wait for CAPTCHA processing
                 sb.sleep(2)
             except Exception:
@@ -112,7 +79,10 @@ def fetch_page(
                 logging.info("Page content seems incomplete, refreshing the page...")
                 sb.refresh()
                 sb.sleep(2)
-                html_content = normalize_surrogates(sb.get_page_source())
+                page_source = sb.get_page_source()
+                logging.info(f"Initial page source length: {len(page_source)}")
+                html_content = normalize_surrogates(page_source)
+                logging.info(f"Normalized page source length: {len(html_content)}")
 
             if output_filename:
                 # Save HTML content to file
