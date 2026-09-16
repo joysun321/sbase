@@ -1,4 +1,3 @@
-#!/home/nick/.cache/pypoetry/virtualenvs/selbase-env-ElBpnQdt-py3.10/bin/python3
 """
 Web Scraper using SeleniumBase
 Fetches content from websites with bot detection and CAPTCHA handling
@@ -95,7 +94,7 @@ def fetch_page(
             logging.info("Extracting page content...")
 
             # via javascript execution
-            page_source = driver.execute_script(
+            page_source = sb.execute_script(
                 "return document.documentElement.outerHTML;"
             )
             logging.info(f"(JS) Initial page source length: {len(page_source)}")
