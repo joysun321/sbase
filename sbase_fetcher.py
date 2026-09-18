@@ -75,7 +75,7 @@ def fetch_page(
             logging.info(f"Normalized page source length: {len(html_content)}")
 
             # Refresh the page if html_content too short or empty
-            if not html_content or len(html_content) < 500:
+            if not html_content or len(html_content) < 30500:
                 logging.info("Page content seems incomplete, refreshing the page...")
                 sb.refresh()
                 sb.sleep(2)
