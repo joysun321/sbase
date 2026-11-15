@@ -50,12 +50,25 @@ def fetch_page(
 
             # Check and handle CAPTCHA if present
             logging.info("Checking for CAPTCHA...")
-            try:
-                sb.uc_gui_click_captcha()
-                # Wait for CAPTCHA processing
-                sb.sleep(2)
-            except Exception:
-                logging.info("No CAPTCHA detected or already solved")
+            for attempt in range(1, captcha_attempts + 1):
+                try:
+                    sb.uc_gui_click_captcha(timeout=captcha_timeout_seconds)
+                    logging.info(
+                        f"CAPTCHA handled on attempt {attempt}"
+                    )
+                    sb.sleep(2)
+                    break
+                except Exception:
+                    if attempt == captcha_attempts:
+                        logging.info(
+                            "No CAPTCHA detected or already solved "
+                            f"(after {attempt} attempt(s))"
+                        )
+                    else:
+                        logging.info(
+                            f"CAPTCHA attempt {attempt} failed, retrying..."
+                        )
+                        sb.sleep(1)
 
             # Extract page source
             logging.info("Extracting page content...")
